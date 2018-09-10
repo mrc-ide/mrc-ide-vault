@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -e
+
+echo -n "Root token: "
+read -s TOKEN
+
+HERE=$(dirname $0)
+
+. "${HERE}/config"
+
+export VAULT_ADDR=$SERVER_URL
+
+vault login $TOKEN
+
+vault policy write standard "$HERE/conf/standard.policy"
+
+vault auth enable github
+vault write auth/github/config organization="$GITHUB_ORG"
+vault write "auth/github/map/teams/$GITHUB_TEAM_ADMIN" value=standard
+
+echo "Enabled GitHub authentication for the $GITHUB_TEAM_ADMIN team"
+echo "within the $GITHUB_ORG organization"
+echo
+echo "You can now authenticate against the vault using"
+echo
+echo "    export VAULT_ADDR=$SERVER_URL"
+echo "    vault login -method=github token=[YOUR_GITHUB_TOKEN]"
+echo
+echo "To obtain your GitHub personal access token see"
+echo "https://help.github.com/articles/creating-an-access-token-for-command-line-use/"

@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+set -e
+
+HERE=$(dirname $0)
+
+. "${HERE}/config"
+
+NAME_IMAGE="${NAME_PREFIX}-vault"
+NAME_CONTAINER="${NAME_PREFIX}-vault"
+VOLUME_DATA="${NAME_PREFIX}-vault-data"
+VOLUME_LOGS="${NAME_PREFIX}-vault-logs"
+
+if docker container inspect $NAME_CONTAINER > /dev/null 2>&1; then
+    echo "Error: docker container $NAME_CONTAINER is already running"
+    exit 1
+fi
+
+if ! docker volume inspect "$VOLUME_DATA" > /dev/null 2>&1; then
+    echo "Error: docker volume $VOLUME_DATA does not exist"
+    echo
+    echo "If this is a first time deployment, consider"
+    echo
+    echo "  docker volume create $VOLUME_DATA"
+    exit 1
+fi
+
+if ! docker volume inspect "$VOLUME_LOGS" > /dev/null 2>&1; then
+    docker volume create "$VOLUME_LOGS"
+fi
+
+if [[ ! -f $HERE/tls/key.pem.enc ]]; then
+    echo "Please run the tls setup first"
+    exit 1
+fi
+
+docker build \
+       --build-arg GITHUB_URL=$GITHUB_URL \
+       --build-arg SERVER_URL=$SERVER_URL \
+       -t "$NAME_IMAGE" \
+       "$HERE"
+
+docker run -d --rm \
+       --cap-add=IPC_LOCK \
+       --name "$NAME_CONTAINER" \
+       -v "$VOLUME_DATA:/vault/file" \
+       -v "$VOLUME_LOGS:/vault/logs" \
+       -p "8200:8200" \
+       "$NAME_IMAGE"
+
+docker exec -it "$NAME_CONTAINER" decrypt-ssl-key
+
+echo "Vault is now running in the $NAME_CONTAINER container."
+echo
+echo "If you are restoring a vault, run"
+echo
+echo "    export VAULT_ADDR=$SERVER_URL"
+echo "    vault operator unseal # multiple times until unsealed"
+echo
+echo "If you are starting a brand new vault you should run"
+echo
+echo "    ./init"
+echo
+echo "followed by"
+echo
+echo "    ./setup"
