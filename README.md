@@ -2,6 +2,12 @@
 
 This repo is still somewhat tied to our needs but is hopefully closer to something that can be repurposed at will than it's predecessor [`montagu-vault`](https://github.com/vimc/montagu-vault).
 
+## Install vault
+
+Download vault from it's official site https://www.vaultproject.io/downloads.html
+
+This needs to be done on the machine that will host the vault container too.
+
 ## Initial setup
 
 * Create an encrypted copy of the SSL certificate (`tls/key.pem.enc`) if that has not been done yet (see section below)
