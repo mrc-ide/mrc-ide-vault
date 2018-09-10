@@ -24,7 +24,7 @@ ICT are likely to give a series of files:
 The certificates will likely come in a zip file.  For this particular vault these were dealt with by
 
 ```bash
-cat tls/certs/web-dev_dide_ic_ac_uk.crt \
+cat tls/certs/vault_dide_ic_ac_uk.crt \
     tls/certs/QuoVadisOVIntermediateCertificate.crt > \
     tls/certificate.pem
 ```
