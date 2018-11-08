@@ -8,6 +8,13 @@ Download vault from it's official site https://www.vaultproject.io/downloads.htm
 
 This needs to be done on the machine that will host the vault container too.
 
+## Use this vault
+
+```bash
+export VAULT_ADDR=https://vault.dide.ic.ac.uk:8200
+vault login -method=github
+```
+
 ## Initial setup
 
 * Create an encrypted copy of the SSL certificate (`tls/key.pem.enc`) if that has not been done yet (see section below)
