@@ -39,3 +39,13 @@ cat tls/certs/vault_dide_ic_ac_uk.crt \
 and copying the key file as `tls/key.pem`
 
 Then run `./tls/encrypt-key` and follow the instructions it produces.
+
+## Re-keying
+
+This is documented here:
+
+https://www.vaultproject.io/guides/operations/rekeying-and-rotating
+
+## Generate a new root token
+
+https://www.vaultproject.io/guides/operations/generate-root
