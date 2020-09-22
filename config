@@ -3,5 +3,5 @@ GITHUB_URL=https://github.com/mrc-ide/mrc-ide-vault
 SERVER_URL=https://vault.dide.ic.ac.uk:8200
 GITHUB_ORG=mrc-ide
 GITHUB_TEAM_ADMIN=admin
-KEY_OWNERS="Martin Wes Alex James Rich"
+KEY_OWNERS="Alex Emma Rich Rob Wes"
 KEY_THRESHOLD=2
