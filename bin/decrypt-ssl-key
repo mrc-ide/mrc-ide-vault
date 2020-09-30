@@ -3,17 +3,10 @@ set -e
 FILE_ENC=/vault/config/tls/key.pem.enc
 FILE_CLEAR=/vault/config/tls/key.pem
 VAULT_BASENAME=$(basename $VAULT_GITHUB_URL)
-echo "On your PC, run"
+echo "In your personal password manager, you should have the decryption key"
+echo "for the ssl cert - it will be a 64-character hex string. Please paste"
+echo "this below"
 echo
-echo "  git clone $VAULT_GITHUB_URL"
-echo "  ./${VAULT_BASENAME}/tls/decrypt-key <your-key-name>"
-echo
-echo
-echo "where <your-key-name> corresponds to an entry in tls/pubkey/"
-echo "that you have the private key for.  If you can't remember, run the"
-echo "decrypt-key command with no arguments and it will print value names."
-echo
-echo "Then copy the printed symmetric key: "
 echo -n "key: "
 read SYMKEY
 export SYMKEY

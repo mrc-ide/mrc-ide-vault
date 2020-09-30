@@ -36,7 +36,7 @@ cat tls/certs/vault_dide_ic_ac_uk.crt \
     tls/certificate.pem
 ```
 
-and copying the key file as `tls/key.pem`
+and copying the private key file as `tls/key.pem`
 
 Then run `./tls/encrypt-key` and follow the instructions it produces.
 
