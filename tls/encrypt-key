@@ -1,49 +1,35 @@
 #!/usr/bin/env bash
 set -e
 
+HERE=$(dirname $0)
+ROOT=$(realpath $HERE/..)
+
 # https://gist.github.com/kennwhite/9918739
 # https://www.bjornjohansen.no/encrypt-file-using-ssh-key
-PATH_TLS=tls
-FILE_CLEAR=$PATH_TLS/key.pem
-FILE_ENC=$PATH_TLS/key.pem.enc
-PATH_PUBKEY=$PATH_TLS/pubkey
-PATH_KEY=$PATH_TLS/key
+FILE_CLEAR=tls/key.pem
+FILE_ENC=tls/key.pem.enc
 
-if [ ! -f $FILE_CLEAR ]; then
-    echo "Reading ssl key from existing vault"
-    ## FIXME: this needs pulling from a configuration
-    export VAULT_ADDR='https://web-dev.dide.ic.ac.uk:8200'
-    if [ -z $VAULT_AUTH_GITHUB_TOKEN ]; then
-        echo -n "Paste your github token: "
-        read -s VAULT_AUTH_GITHUB_TOKEN
-    fi
-    vault login -method=github
-    vault read -field=key secret/ssl/support > $FILE_CLEAR
+if [ ! -f "$ROOT/$FILE_CLEAR" ]; then
+    echo "Expected cleartext key file at $FILE_CLEAR"
+    echo "Found cleartext key at tls/key.pem"
 fi
 
 # Generate the symmetric key and encrypt our ssl private key with it
 SYMKEY=$(openssl rand -hex 32)
-echo "Generated symmetric key: $SYMKEY"
-# If we generate and export in one step then error codes get swallowed
 export SYMKEY
-openssl aes-256-cbc -md md5 -in $FILE_CLEAR -out $FILE_ENC -pass "env:SYMKEY"
 
-## Then encrypt the symmetric key with each public key:
-rm -rf $PATH_KEY
-mkdir -p $PATH_KEY
-for KEY_NAME in $(ls -1 $PATH_PUBKEY); do
-    FILE_PUBKEY="$PATH_PUBKEY/$KEY_NAME"
-    echo "Creating key for $KEY_NAME"
-    echo $SYMKEY |
-        openssl rsautl -encrypt -oaep -pubin \
-                -inkey <(ssh-keygen -e -f $FILE_PUBKEY -m PKCS8) \
-                -out "$PATH_KEY/$KEY_NAME"
-done
+# Encrypt the key
+openssl aes-256-cbc -md md5 \
+        -in "$ROOT/$FILE_CLEAR" \
+        -out "$ROOT/$FILE_ENC" \
+        -pass "env:SYMKEY"
 
-echo ""
-echo "Now test that everything is working:"
-echo "1) ./$PATH_TLS/decrypt-key"
-echo "and check that you get the same symmetric key back out."
-echo "2) ./$PATH_TLS/decrypt-ssl-key-local"
-echo "and check there is no diff between the original key and the decrypted key"
-echo "3) rm ./$PATH_TLS/key.pem ./$PATH_TLS/key.pem.copy"
+# Tell the user what to do
+echo "Encrypted key is now saved as $FILE_ENC"
+echo
+echo "The key to decrypt this file, which you need to start vault, is"
+echo "  $SYMKEY"
+echo
+echo "Distribute this key securely to people who can unlock the vault"
+echo
+echo "Delete the plaintext key at $FILE_CLEAR when happy"
