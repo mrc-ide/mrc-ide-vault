@@ -22,23 +22,7 @@ vault login -method=github
 
 ## TLS and SSL keys
 
-ICT are likely to give a series of files:
-
-* `QuoVadisOVIntermediateCertificate.crt`
-* `<fqdn>.crt`
-* `<something>.key`
-
-The certificates will likely come in a zip file.  For this particular vault these were dealt with by
-
-```bash
-cat tls/certs/vault_dide_ic_ac_uk.crt \
-    tls/certs/QuoVadisOVIntermediateCertificate.crt > \
-    tls/certificate.pem
-```
-
-and copying the private key file as `tls/key.pem`
-
-Then run `./tls/encrypt-key` and follow the instructions it produces.
+ICT will now provide a single updated certificate file, update the `certs/certificate.pem` file with the new file and commit.
 
 ## Re-keying
 
