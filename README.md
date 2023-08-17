@@ -1,6 +1,4 @@
-## mrc-ide vault
-
-This repo is still somewhat tied to our needs but is hopefully closer to something that can be repurposed at will than it's predecessor [`montagu-vault`](https://github.com/vimc/montagu-vault).
+# mrc-ide vault
 
 ## Install vault
 
@@ -15,10 +13,26 @@ export VAULT_ADDR=https://vault.dide.ic.ac.uk:8200
 vault login -method=github
 ```
 
-## Initial setup
+## Configure TLS
 
-* Create an encrypted copy of the SSL certificate (`tls/key.pem.enc`) if that has not been done yet (see section below)
-* Run `./run` and follow the instructions
+Copy your certificate and key into a directory `tls/` (gitignored in this repo) and run
+
+```
+docker volume create mrc-ide-tls
+docker run --rm -v ${PWD}/tls:/src -v mrc-ide-tls:/dst ubuntu cp /src/key.pem /dst
+docker run --rm -v ${PWD}/tls:/src -v mrc-ide-tls:/dst ubuntu cp /src/certificate.pem /dst
+```
+
+You need to restart the vault after this.
+
+## Restarting the vault
+
+```
+docker stop mrc-ide-vault
+./run
+```
+
+Then unlock the vault
 
 ## TLS and SSL keys
 
