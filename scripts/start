@@ -41,6 +41,6 @@ docker run -d --rm \
        -v "$VOLUME_DATA:/vault/file" \
        -v "$VOLUME_LOGS:/vault/logs" \
        -v "$VOLUME_TLS:/vault/tls" \
-       -v "$HERE/vault.conf:/vault/config/vault.conf:ro" \
+       -v "$PWD/vault.conf:/vault/config/vault.conf:ro" \
        -p "8200:8200" \
        hashicorp/vault:latest server -config /vault/config/vault.conf
