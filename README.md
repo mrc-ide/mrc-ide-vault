@@ -8,10 +8,16 @@ This needs to be done on the machine that will host the vault container too.
 
 ## Use this vault
 
+From the command line:
+
 ```bash
 export VAULT_ADDR=https://vault.dide.ic.ac.uk:8200
 vault login -method=github
 ```
+
+Via the web ui:
+
+Go to https://vault.dide.ic.ac.uk:8200/ui - select "github" from the authentication options and enter your token.
 
 ## Working with the deployment
 
