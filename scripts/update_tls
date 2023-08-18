@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+if [[ ! -f "${PWD}/tls/key.pem" ]]; then
+    echo "Expected to find file tls/key.pem"
+    exit 1
+fi
+
+if [[ ! -f "${PWD}/tls/certificate.pem" ]]; then
+    echo "Expected to find file tls/certificate.pem"
+    exit 1
+fi
+
+docker volume create mrc-ide-tls
+docker run --rm -v ${PWD}/tls:/src -v mrc-ide-tls:/dst ubuntu cp /src/key.pem /dst
+docker run --rm -v ${PWD}/tls:/src -v mrc-ide-tls:/dst ubuntu cp /src/certificate.pem /dst

@@ -13,14 +13,16 @@ export VAULT_ADDR=https://vault.dide.ic.ac.uk:8200
 vault login -method=github
 ```
 
+## Working with the deployment
+
+You will need to have ssh key forwarding enabled onto `vault.dide.ic.ac.uk` in order to fetch from this repo.
+
 ## Configure TLS
 
 Copy your certificate and key into a directory `tls/` (gitignored in this repo) and run
 
 ```
-docker volume create mrc-ide-tls
-docker run --rm -v ${PWD}/tls:/src -v mrc-ide-tls:/dst ubuntu cp /src/key.pem /dst
-docker run --rm -v ${PWD}/tls:/src -v mrc-ide-tls:/dst ubuntu cp /src/certificate.pem /dst
+./scripts/update_tls
 ```
 
 You need to restart the vault after this.
@@ -28,8 +30,13 @@ You need to restart the vault after this.
 ## Restarting the vault
 
 ```
-docker stop mrc-ide-vault
-./run
+./scripts/restart
+```
+
+## Starting the vault
+
+```
+./scripts/start
 ```
 
 Then unlock the vault
