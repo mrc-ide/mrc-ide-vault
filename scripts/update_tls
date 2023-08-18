@@ -9,6 +9,8 @@ if [[ ! -f "${PWD}/tls/certificate.pem" ]]; then
     exit 1
 fi
 
-docker volume create mrc-ide-tls
-docker run --rm -v ${PWD}/tls:/src -v mrc-ide-tls:/dst ubuntu cp /src/key.pem /dst
-docker run --rm -v ${PWD}/tls:/src -v mrc-ide-tls:/dst ubuntu cp /src/certificate.pem /dst
+
+VOLUME=mrc-ide-vault-tls
+docker volume create $VOLUME
+docker run --rm -v ${PWD}/tls:/src -v $VOLUME:/dst ubuntu cp /src/key.pem /dst
+docker run --rm -v ${PWD}/tls:/src -v $VOLUME:/dst ubuntu cp /src/certificate.pem /dst
