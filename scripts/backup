@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+import argparse
+import os
+import pickle
+
+import hvac
+
+
+def client():
+    client = hvac.Client(url=os.environ["VAULT_ADDR"])
+    client.auth.github.login(os.environ["VAULT_AUTH_GITHUB_TOKEN"])
+    assert client.is_authenticated()
+    return client
+
+
+def backup(path):
+    print("Creating client")
+    cl = client()
+    print("Reading secrets")
+    d = read_secrets(cl, "secret/")
+    print(f"\nWriting secrets to {path}")
+    with open(path, "wb") as f:
+        pickle.dump(d, f)
+
+
+def read_secrets(cl, path="secret/"):
+    if not path.endswith("/"):
+        path = path + "/"
+    print("*", end="", flush=True)
+    ret = {}
+    d = cl.list(path)["data"]
+    for k in d["keys"]:
+        full = f"{path}{k}"
+        if k.endswith("/"):
+            ret[k] = read_secrets(cl, full)
+        else:
+            print(".", end="", flush=True)
+            ret[k] = cl.read(full)["data"]
+    return ret
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Backup all secrets from vault"
+    )
+    parser.add_argument("filename", type=str,
+                        help="filename to save secrets in")
+    args = parser.parse_args()
+    backup(args.filename)
+
+
+if __name__ == "__main__":
+    main()
