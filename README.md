@@ -1,6 +1,4 @@
-## mrc-ide vault
-
-This repo is still somewhat tied to our needs but is hopefully closer to something that can be repurposed at will than it's predecessor [`montagu-vault`](https://github.com/vimc/montagu-vault).
+# mrc-ide vault
 
 ## Install vault
 
@@ -10,15 +8,56 @@ This needs to be done on the machine that will host the vault container too.
 
 ## Use this vault
 
+From the command line:
+
 ```bash
 export VAULT_ADDR=https://vault.dide.ic.ac.uk:8200
 vault login -method=github
 ```
 
-## Initial setup
+Via the web ui:
 
-* Create an encrypted copy of the SSL certificate (`tls/key.pem.enc`) if that has not been done yet (see section below)
-* Run `./run` and follow the instructions
+Go to https://vault.dide.ic.ac.uk:8200/ui - select "github" from the authentication options and enter your token.
+
+## Working with the deployment
+
+You will need to have ssh key forwarding enabled onto `vault.dide.ic.ac.uk` in order to fetch from this repo.
+
+## Starting the vault
+
+```
+./scripts/start
+```
+
+Then unseal the vault
+
+## Unsealing the vault
+
+Everyone needs to run
+
+```
+vault operator unseal
+```
+
+and provide their key
+
+## Configure TLS
+
+Copy your certificate and key into a directory `tls/` (gitignored in this repo) and run
+
+```
+./scripts/update_tls
+```
+
+You need to restart the vault after this.
+
+## Restarting the vault
+
+```
+./scripts/restart
+```
+
+You need to unseal the vault after this
 
 ## TLS and SSL keys
 
