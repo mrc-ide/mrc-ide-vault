@@ -17,6 +17,24 @@ vault login -method=github
 
 You will need to have ssh key forwarding enabled onto `vault.dide.ic.ac.uk` in order to fetch from this repo.
 
+## Starting the vault
+
+```
+./scripts/start
+```
+
+Then unseal the vault
+
+## Unsealing the vault
+
+Everyone needs to run
+
+```
+vault operator unseal
+```
+
+and provide their key
+
 ## Configure TLS
 
 Copy your certificate and key into a directory `tls/` (gitignored in this repo) and run
@@ -33,13 +51,7 @@ You need to restart the vault after this.
 ./scripts/restart
 ```
 
-## Starting the vault
-
-```
-./scripts/start
-```
-
-Then unlock the vault
+You need to unseal the vault after this
 
 ## TLS and SSL keys
 
