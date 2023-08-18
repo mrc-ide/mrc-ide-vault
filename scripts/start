@@ -44,3 +44,7 @@ docker run -d --rm \
        -v "$PWD/vault.conf:/vault/config/vault.conf:ro" \
        -p "8200:8200" \
        hashicorp/vault:latest server -config /vault/config/vault.conf
+
+
+echo "You need to unseal the vault now!"
+echo "See https://github.com/mrc-ide/mrc-ide-vault for details"
