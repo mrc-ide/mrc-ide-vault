@@ -1,4 +1,4 @@
-tls*
 __pycache__
 *.pickle
 *.pyc
+hdb-credentials
