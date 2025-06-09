@@ -1,4 +1,5 @@
-tls*
 __pycache__
 *.pickle
 *.pyc
+.lego
+hdb-credentials

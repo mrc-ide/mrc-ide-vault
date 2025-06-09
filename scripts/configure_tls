@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+set -eu
+
+NAME_PREFIX="mrc-ide"
+NAME_CONTAINER="${NAME_PREFIX}-vault"
+VOLUME_TLS="${NAME_PREFIX}-vault-tls"
+
+DOMAIN=vault.dide.ic.ac.uk
+
+USERGROUP="$(id -u):$(id -g)"
+
+# TODO remove `pr-2` when this is merged
+LEGO_HDB_IMAGE=ghcr.io/reside-ic/lego-hdb:pr-2
+: "${LEGO_SERVER:=https://acme-v02.api.letsencrypt.org/directory}"
+
+mkdir -p .lego
+docker run \
+  --pull=always \
+  --env-file hdb-credentials \
+  --volume "$PWD/.lego:/.lego" \
+  --user "$USERGROUP" \
+  "$LEGO_HDB_IMAGE" \
+  --server "$LEGO_SERVER" \
+  --domains "$DOMAIN" \
+  --email reside@imperial.ac.uk \
+  --dns exec \
+  --accept-tos run
+
+docker run --rm -v "$PWD/.lego/certificates:/src" -v "$VOLUME:/dst ubuntu cp /src/$DOMAIN.crt" /dst/certificate.pem
+docker run --rm -v "$PWD/.lego/certificates:/src" -v "$VOLUME:/dst ubuntu cp /src/$DOMAIN.key" /dst/key.pem
+
+docker volume create $VOLUME_TLS
+
+sudo install -m755 /dev/stdin /etc/cron.daily/epimodels-renew-certificate <<EOF
+#!/usr/bin/env bash
+set -eu
+docker run \\
+    --env-file $PWD/hdb-credentials \\
+    --volume $PWD/.lego:/.lego \\
+    --user "$USERGROUP" \\
+    "$LEGO_HDB_IMAGE" \\
+    --server "$LEGO_SERVER" \\
+    --domains "$DOMAIN" \\
+    --email reside@imperial.ac.uk \\
+    --dns exec \\
+    --accept-tos renew
+
+docker run --rm -v "$PWD/.lego/certificates:/src" -v "$VOLUME:/dst ubuntu cp /src/$DOMAIN.crt" /dst/certificate.pem
+docker run --rm -v "$PWD/.lego/certificates:/src" -v "$VOLUME:/dst ubuntu cp /src/$DOMAIN.key" /dst/key.pem
+docker kill --signal SIGHUP $NAME_CONTAINER
+EOF
