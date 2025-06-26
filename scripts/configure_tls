@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+set -eu
+
+NAME_PREFIX="mrc-ide"
+NAME_CONTAINER="${NAME_PREFIX}-vault"
+VOLUME_TLS="${NAME_PREFIX}-vault-tls"
+
+ACME_BUDDY_IMAGE=ghcr.io/reside-ic/acme-buddy
+ACME_BUDDY_CONTAINER="${NAME_PREFIX}-vault-acme-buddy"
+
+DOMAIN=vault.dide.ic.ac.uk
+
+docker volume create $VOLUME_TLS
+
+if docker container inspect $ACME_BUDDY_CONTAINER > /dev/null 2>&1; then
+    echo "*** Stopping existing acme-buddy container"
+    docker rm --force $ACME_BUDDY_CONTAINER
+fi
+
+echo "*** Requesting initial certificate"
+docker run --rm \
+    --pull=always \
+    --volume $VOLUME_TLS:/tls \
+    --volume /var/run/docker.sock:/var/run/docker.sock \
+    --env ACME_BUDDY_STAGING \
+    --env-file hdb-credentials \
+    "$ACME_BUDDY_IMAGE" \
+    --oneshot \
+    --domain "$DOMAIN" \
+    --email reside@imperial.ac.uk \
+    --dns-provider hdb \
+    --certificate-path /tls/certificate.pem \
+    --key-path /tls/key.pem \
+    --account-path /tls/account.json \
+    --reload-container "$NAME_CONTAINER"
+
+echo "*** Starting long-running acme-buddy container"
+docker run --rm -d \
+    --name "$ACME_BUDDY_CONTAINER" \
+    --publish 2112:2112 \
+    --volume /var/run/docker.sock:/var/run/docker.sock \
+    --volume $VOLUME_TLS:/tls \
+    --env ACME_BUDDY_STAGING \
+    --env-file hdb-credentials \
+    "$ACME_BUDDY_IMAGE" \
+    --domain "$DOMAIN" \
+    --email reside@imperial.ac.uk \
+    --dns-provider hdb \
+    --certificate-path /tls/certificate.pem \
+    --key-path /tls/key.pem \
+    --account-path /tls/account.json \
+    --reload-container "$NAME_CONTAINER"
