@@ -19,9 +19,27 @@ Via the web ui:
 
 Go to https://vault.dide.ic.ac.uk:8200/ui - select "github" from the authentication options and enter your token.
 
-## Working with the deployment
+## Configuring TLS certificates
 
-You will need to have ssh key forwarding enabled onto `vault.dide.ic.ac.uk` in order to fetch from this repo.
+The certificates are automatically obtained from Let's Encrypt. The following
+command will obtain an initial certificate and start a long-running container
+to automatically renew the certificate when needed.
+
+```
+./scripts/configure_tls
+```
+
+The long-running container will automatically send a signal to Vault when the
+certificate is renewed, which will cause Vault to reload it.
+
+The script assumes the existence of an `hdb-credentials` file on disk. The
+credentials can be found in the Vault itself under
+`secret/certbot-hdb/credentials`, assuming the Vault is up and running in the
+first place. If the Vault contents and these credentials are lost, we would
+need to obtain new credentials from ICT. See the [acme-buddy][acme-buddy] docs
+for more details about the file's expected format.
+
+[acme-buddy]: https://github.com/reside-ic/acme-buddy
 
 ## Starting the vault
 
@@ -41,16 +59,6 @@ vault operator unseal
 
 and provide their key
 
-## Configure TLS
-
-Copy your certificate and key into a directory `tls/` (gitignored in this repo) and run
-
-```
-./scripts/update_tls
-```
-
-You need to restart the vault after this.
-
 ## Restarting the vault
 
 ```
@@ -58,10 +66,6 @@ You need to restart the vault after this.
 ```
 
 You need to unseal the vault after this
-
-## TLS and SSL keys
-
-ICT will now provide a single updated certificate file, update the `certs/certificate.pem` file with the new file and commit.
 
 ## Re-keying
 

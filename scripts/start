@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 set -eu
 
-HERE=$(dirname $0)
-
 NAME_PREFIX="mrc-ide"
-NAME_IMAGE="${NAME_PREFIX}-vault"
 NAME_CONTAINER="${NAME_PREFIX}-vault"
 VOLUME_DATA="${NAME_PREFIX}-vault-data"
 VOLUME_LOGS="${NAME_PREFIX}-vault-logs"
