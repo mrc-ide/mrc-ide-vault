@@ -43,7 +43,11 @@ for more details about the file's expected format.
 
 ## Starting the vault
 
+The scripts expect you to be in the root of the repositry, where you should
+also see `vault.conf`. To start the vault from scratch:-
+
 ```
+./scripts/configure_tls
 ./scripts/start
 ```
 
@@ -65,7 +69,7 @@ and provide their key
 ./scripts/restart
 ```
 
-You need to unseal the vault after this
+You need to unseal the vault after this.
 
 ## Re-keying
 
@@ -76,3 +80,26 @@ https://www.vaultproject.io/guides/operations/rekeying-and-rotating
 ## Generate a new root token
 
 https://www.vaultproject.io/guides/operations/generate-root
+
+## Managing users
+
+The vault is currently configured to allow access to uses in the
+`admin` team within the `mrc-ide` github org. To verify this,
+run `vault login` with the root token, and run
+`vault read auth/github/config` to see the organization, and
+`vault read auth/github/map/teams` to see which teams have access.
+
+## Upgrading vault
+
+Any vault operation will show the current version of the vault. 
+Read the [changelog][changelog] first to see any issues you
+might run into, particularly those titled `BREAKING CHANGES`. 
+Then if and when it seems good to proceed:-
+
+[changelog]: https://github.com/hashicorp/vault/releases
+
+```
+docker stop mrc-ide-vault
+docker pull hashicorp/vault:latest
+./scripts/start
+```
