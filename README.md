@@ -83,7 +83,7 @@ https://www.vaultproject.io/guides/operations/generate-root
 
 ## Managing users
 
-The vault is currently configured to allow access to uses in the
+The vault is currently configured to allow access to users in the
 `admin` team within the `mrc-ide` github org. To verify this,
 run `vault login` with the root token, and run
 `vault read auth/github/config` to see the organization, and
