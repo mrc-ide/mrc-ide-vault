@@ -43,7 +43,7 @@ for more details about the file's expected format.
 
 ## Starting the vault
 
-The scripts expect you to be in the root of the repositry, where you should
+The scripts expect you to be in the root of the repo, where you should
 also see `vault.conf`. To start the vault from scratch:-
 
 ```
