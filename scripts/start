@@ -6,8 +6,14 @@ NAME_CONTAINER="${NAME_PREFIX}-vault"
 VOLUME_DATA="${NAME_PREFIX}-vault-data"
 VOLUME_LOGS="${NAME_PREFIX}-vault-logs"
 VOLUME_TLS="${NAME_PREFIX}-vault-tls"
+CONFIG_FILE="$(realpath "$(dirname "$0")/../vault.conf")"
 
-if docker container inspect $NAME_CONTAINER > /dev/null 2>&1; then
+if [[ ! -f "$CONFIG_FILE" ]]; then
+    echo "Error: Config file not found: $CONFIG_FILE" >&2
+    exit 1
+fi
+
+if docker container inspect "$NAME_CONTAINER" > /dev/null 2>&1; then
     echo "Error: docker container $NAME_CONTAINER is already running"
     exit 1
 fi
@@ -38,7 +44,7 @@ docker run -d --rm \
        -v "$VOLUME_DATA:/vault/file" \
        -v "$VOLUME_LOGS:/vault/logs" \
        -v "$VOLUME_TLS:/vault/tls" \
-       -v "$PWD/vault.conf:/vault/config/vault.conf:ro" \
+       -v "$CONFIG_FILE:/vault/config/vault.conf:ro" \
        -p "8200:8200" \
        hashicorp/vault:latest server -config /vault/config/vault.conf
 
