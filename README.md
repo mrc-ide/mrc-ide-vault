@@ -43,8 +43,7 @@ for more details about the file's expected format.
 
 ## Starting the vault
 
-The scripts expect you to be in the root of the repo, where you should
-also see `vault.conf`. To start the vault from scratch:-
+To start the vault from scratch:-
 
 ```
 ./scripts/configure_tls
